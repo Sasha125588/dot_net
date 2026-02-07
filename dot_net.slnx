@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/lab_1/">
+    <Project Path="lab_1/1.3/1.3.csproj" />
+    <Project Path="lab_1/2/2.csproj" />
+    <Project Path="lab_1/3.3/3.3.csproj" />
+    <Project Path="lab_1/4.3/4.3.csproj" />
+  </Folder>
+  <Folder Name="/lab_1/tests/">
+    <Project Path="lab_1/tests/1.3Test/1.3Test.csproj" />
+    <Project Path="lab_1/tests/2Test/2Test.csproj" />
+    <Project Path="lab_1/tests/3.3Test/3.3Test.csproj" />
+    <Project Path="lab_1/tests/4.3Test/4.3Test.csproj" />
+  </Folder>
+  <Folder Name="/utils/">
+    <Project Path="utils/Utils/Utils.csproj" />
+  </Folder>
+  <Folder Name="/utils/tests/">
+    <Project Path="utils/tests/ResultTest/ResultTest.csproj" />
+  </Folder>
+</Solution>

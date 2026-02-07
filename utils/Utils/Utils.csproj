@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Utils</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="xunit.v3.assert">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\xunit.v3.assert\3.2.2\lib\net8.0\xunit.v3.assert.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
