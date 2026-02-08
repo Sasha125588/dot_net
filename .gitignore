@@ -87,6 +87,7 @@ _ReSharper*/
 
 # User-specific files
 *.rsuser
+.env
 
 # Mono auto generated files
 mono_crash.*

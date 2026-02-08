@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
-    <RootNamespace>_4._3Test</RootNamespace>
+    <RootNamespace>_1Test</RootNamespace>
     <TargetFramework>net10.0</TargetFramework>
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>  
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
@@ -24,8 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../4.3/4.3.csproj" />
-    <ProjectReference Include="../../../utils/Utils.csproj" />
+    <ProjectReference Include="../../1/1.csproj" />
   </ItemGroup>
 
 </Project>

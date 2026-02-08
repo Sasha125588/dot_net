@@ -11,6 +11,12 @@
     <Project Path="lab_1/tests/3.3Test/3.3Test.csproj" />
     <Project Path="lab_1/tests/4.3Test/4.3Test.csproj" />
   </Folder>
+  <Folder Name="/lab_2/">
+    <Project Path="lab_2/1/1.csproj" />
+  </Folder>
+  <Folder Name="/lab_2/tests/">
+    <Project Path="lab_2/tests/1Test/1Test.csproj" />
+  </Folder>
   <Folder Name="/utils/">
     <Project Path="utils/Utils/Utils.csproj" />
   </Folder>
