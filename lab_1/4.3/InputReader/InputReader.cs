@@ -1,3 +1,5 @@
+using _4._3.ErrorFormatters;
+using _4._3.Errors;
 using Utils;
 using _4._3.Validation;
 
@@ -12,22 +14,20 @@ public static class InputReader
 			Console.Write("Введіть дату початку (DD.MM.YYYY): ");
 			var input = Console.ReadLine() ?? string.Empty;
 
-			var result = Validator.ValidateStartDate(input);
+			var validatedStartDate = Validator.ValidateStartDate(input);
 
-			if (result.IsOk())
+			switch (validatedStartDate)
 			{
-				return result.Unwrap();
-			}
+				case Ok<DateOnly, ValidationError> ok:
+					return ok.Value;
+				case Err<DateOnly, ValidationError> err:
+					var errMsg = ValidationErrorFormatter.Format(err.Error);
 
-			result.Match(
-				onOk: _ => { },
-				onErr: error =>
-				{
-					Console.WriteLine($"❌ {error.ToMessage()}");
+					Console.WriteLine($"❌ {errMsg}");
 					Console.WriteLine("Спробуйте ще раз.");
 					Console.WriteLine();
-				}
-			);
+					break;
+			}
 		}
 	}
 
@@ -38,22 +38,20 @@ public static class InputReader
 			Console.Write("Введіть дату кінця (DD.MM.YYYY): ");
 			var input = Console.ReadLine() ?? string.Empty;
 
-			var result = Validator.ValidateEndDate(input, startDate);
+			var validatedEndDate = Validator.ValidateEndDate(input, startDate);
 
-			if (result.IsOk())
+			switch (validatedEndDate)
 			{
-				return result.Unwrap();
-			}
+				case Ok<DateOnly, ValidationError> ok:
+					return ok.Value;
+				case Err<DateOnly, ValidationError> err:
+					var errMsg = ValidationErrorFormatter.Format(err.Error);
 
-			result.Match(
-				onOk: _ => { },
-				onErr: error =>
-				{
-					Console.WriteLine($"❌ {error.ToMessage()}");
+					Console.WriteLine($"❌ {errMsg}");
 					Console.WriteLine("Спробуйте ще раз.");
 					Console.WriteLine();
-				}
-			);
+					break;
+			}
 		}
 	}
 

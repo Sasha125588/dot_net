@@ -20,14 +20,14 @@ public static class GradeHelper
 	public static Result<int, string> TryParseGrade(string? input)
 	{
 		if (string.IsNullOrWhiteSpace(input))
-			return new Result<int, string>.Err("не введено значення");
+			return Result.Err<int, string>("не введено значення");
 
 		if (!int.TryParse(input, out var value))
-			return new Result<int, string>.Err("очікується ціле число");
+			return Result.Err<int, string>("очікується ціле число");
 
 		if (value is < 0 or > 100)
-			return new Result<int, string>.Err("має бути від 0 до 100");
+			return Result.Err<int, string>("має бути від 0 до 100");
 
-		return new Result<int, string>.Ok(value);
+		return Result.Ok<int, string>(value);
 	}
 }

@@ -7,13 +7,14 @@ public static class Validator
 {
 	private static Result<DateOnly, ValidationError> TryParseDateOnly(string input) =>
 		DateOnly.TryParse(input, out var value)
-			? new Result<DateOnly, ValidationError>.Ok(value)
-			: new Result<DateOnly, ValidationError>.Err(new ValidationError.ParseDateOnlyError(input));
+			? Result.Ok<DateOnly, ValidationError>(value)
+			: Result.Err<DateOnly, ValidationError>(new ValidationError.ParseDateOnlyError(input));
 
-	private static Result<DateOnly, ValidationError> ValidateEndDateIsAfterStartDate(DateOnly startDate, DateOnly endDate) =>
+	private static Result<DateOnly, ValidationError>
+		ValidateEndDateIsAfterStartDate(DateOnly startDate, DateOnly endDate) =>
 		startDate < endDate
-			? new Result<DateOnly, ValidationError>.Ok(endDate)
-			: new Result<DateOnly, ValidationError>.Err(
+			? Result.Ok<DateOnly, ValidationError>(endDate)
+			: Result.Err<DateOnly, ValidationError>(
 				new ValidationError.ValidateStartDateAfterEndDate(startDate, endDate));
 
 	public static Result<DateOnly, ValidationError> ValidateStartDate(string input) =>

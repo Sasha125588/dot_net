@@ -1,28 +1,109 @@
+using System.Collections.Immutable;
+
 namespace Utils;
 
 public static class ResultExtensions
 {
-	public static Result<TOut, E> AndThen<T, TOut, E>(this Result<T, E> result, Func<T, Result<TOut, E>> binder)
-	{
-		return result switch
-		{
-			Result<T, E>.Ok ok => binder(ok.Value),
-			Result<T, E>.Err err => new Result<TOut, E>.Err(err.Error),
-			_ => throw new InvalidOperationException()
-		};
-	}
+	// ============================================================
+	// Перевірка стану Result
+	// ============================================================
+
+	public static bool IsOk<T, E>(this Result<T, E> result) =>
+		result is Ok<T, E>;
+
+	public static bool IsErr<T, E>(this Result<T, E> result) =>
+		result is Err<T, E>;
+
+
+	// ============================================================
+	// Перетворення значень
+	// ============================================================
 
 	public static Result<TOut, E> Map<T, TOut, E>(
 		this Result<T, E> result,
-		Func<T, TOut> mapper)
-	{
-		return result switch
+		Func<T, TOut> mapper) =>
+		result switch
 		{
-			Result<T, E>.Ok ok => new Result<TOut, E>.Ok(mapper(ok.Value)),
-			Result<T, E>.Err err => new Result<TOut, E>.Err(err.Error),
+			Ok<T, E> ok => Result.Ok<TOut, E>(mapper(ok.Value)),
+			Err<T, E> err => Result.Err<TOut, E>(err.Error),
 			_ => throw new InvalidOperationException()
 		};
+
+	public static Result<T, EOut> MapErr<T, E, EOut>(
+		this Result<T, E> result,
+		Func<E, EOut> mapper) =>
+		result switch
+		{
+			Ok<T, E> ok => Result.Ok<T, EOut>(ok.Value),
+			Err<T, E> err => Result.Err<T, EOut>(mapper(err.Error)),
+			_ => throw new InvalidOperationException()
+		};
+
+	public static Result<ImmutableList<T>, E> Collect<T, E>(
+		this IEnumerable<Result<T, E>> results)
+	{
+		var builder = ImmutableList.CreateBuilder<T>();
+
+		foreach (var result in results)
+		{
+			switch (result)
+			{
+				case Ok<T, E> ok:
+					builder.Add(ok.Value);
+					break;
+				case Err<T, E> err:
+					return Result.Err<ImmutableList<T>, E>(err.Error);
+				default:
+					throw new InvalidOperationException();
+			}
+		}
+
+		return Result.Ok<ImmutableList<T>, E>(builder.ToImmutable());
 	}
+
+	// ============================================================
+	// Композиція та chaining
+	// ============================================================
+
+	public static Result<TOut, E> AndThen<T, TOut, E>(
+		this Result<T, E> result,
+		Func<T, Result<TOut, E>> mapper) =>
+		result switch
+		{
+			Ok<T, E> ok => mapper(ok.Value),
+			Err<T, E> err => Result.Err<TOut, E>(err.Error),
+			_ => throw new InvalidOperationException()
+		};
+
+	public static Result<TOut, E> And<T, TOut, E>(
+		this Result<T, E> result,
+		Result<TOut, E> other) =>
+		result switch
+		{
+			Ok<T, E> => other,
+			Err<T, E> err => Result.Err<TOut, E>(err.Error),
+			_ => throw new InvalidOperationException()
+		};
+
+	public static Result<T, E> Or<T, E>(
+		this Result<T, E> result,
+		Result<T, E> fallback) =>
+		result.IsOk() ? result : fallback;
+
+	public static Result<T, EOut> OrElse<T, E, EOut>(
+		this Result<T, E> result,
+		Func<E, Result<T, EOut>> fallback) =>
+		result switch
+		{
+			Ok<T, E> ok => Result.Ok<T, EOut>(ok.Value),
+			Err<T, E> err => fallback(err.Error),
+			_ => throw new InvalidOperationException()
+		};
+
+
+	// ============================================================
+	// Pattern matching
+	// ============================================================
 
 	public static void Match<T, E>(
 		this Result<T, E> result,
@@ -31,59 +112,101 @@ public static class ResultExtensions
 	{
 		switch (result)
 		{
-			case Result<T, E>.Ok ok: onOk(ok.Value); break;
-			case Result<T, E>.Err err: onErr(err.Error); break;
+			case Ok<T, E> ok:
+				onOk(ok.Value);
+				break;
+
+			case Err<T, E> err:
+				onErr(err.Error);
+				break;
+
+			default:
+				throw new InvalidOperationException();
 		}
 	}
 
-	public static Result<T, EOut> MapError<T, E, EOut>(
+	public static TOut Match<T, E, TOut>(
 		this Result<T, E> result,
-		Func<E, EOut> mapper)
-	{
-		return result switch
+		Func<T, TOut> onOk,
+		Func<E, TOut> onErr) =>
+		result switch
 		{
-			Result<T, E>.Ok ok => new Result<T, EOut>.Ok(ok.Value),
-			Result<T, E>.Err err => new Result<T, EOut>.Err(mapper(err.Error)),
+			Ok<T, E> ok => onOk(ok.Value),
+			Err<T, E> err => onErr(err.Error),
 			_ => throw new InvalidOperationException()
 		};
-	}
 
-	public static T ValueOr<T, E>(this Result<T, E> result, T fallback)
-	{
-		return result switch
+	// ============================================================
+	// Отримання значення з fallback
+	// ============================================================
+
+	public static TOut MapOr<T, TOut, E>(
+		this Result<T, E> result,
+		TOut fallback,
+		Func<T, TOut> mapper) =>
+		result switch
 		{
-			Result<T, E>.Ok ok => ok.Value,
-			Result<T, E>.Err => fallback,
+			Ok<T, E> ok => mapper(ok.Value),
+			Err<T, E> => fallback,
 			_ => throw new InvalidOperationException()
 		};
-	}
 
-	public static T Unwrap<T, E>(this Result<T, E> result)
-	{
-		return result switch
+	public static TOut MapOrElse<T, TOut, E>(
+		this Result<T, E> result,
+		Func<E, TOut> fallbackMapper,
+		Func<T, TOut> mapper) =>
+		result switch
 		{
-			Result<T, E>.Ok ok => ok.Value,
-			Result<T, E>.Err err => throw new InvalidOperationException($"Called Unwrap on Err: {err.Error}"),
+			Ok<T, E> ok => mapper(ok.Value),
+			Err<T, E> err => fallbackMapper(err.Error),
 			_ => throw new InvalidOperationException()
 		};
-	}
 
-	public static T UnwrapOr<T, E>(this Result<T, E> result, T defaultValue)
-	{
-		return result.ValueOr(defaultValue);
-	}
-
-	public static T Expect<T, E>(this Result<T, E> result, string message)
-	{
-		return result switch
+	public static T UnwrapOr<T, E>(
+		this Result<T, E> result,
+		T fallback) =>
+		result switch
 		{
-			Result<T, E>.Ok ok => ok.Value,
-			Result<T, E>.Err err => throw new InvalidOperationException($"{message}: {err.Error}"),
+			Ok<T, E> ok => ok.Value,
+			Err<T, E> => fallback,
 			_ => throw new InvalidOperationException()
 		};
-	}
 
-	public static bool IsOk<T, E>(this Result<T, E> result) => result is Result<T, E>.Ok;
+	public static T ValueOr<T, E>(this Result<T, E> result, T fallback) =>
+		result.UnwrapOr(fallback);
 
-	public static bool IsErr<T, E>(this Result<T, E> result) => result is Result<T, E>.Err;
+	public static T UnwrapOrElse<T, E>(
+		this Result<T, E> result,
+		Func<E, T> fallbackMapper) =>
+		result switch
+		{
+			Ok<T, E> ok => ok.Value,
+			Err<T, E> err => fallbackMapper(err.Error),
+			_ => throw new InvalidOperationException()
+		};
+
+
+	// ============================================================
+	// Отримання значення
+	// ============================================================
+
+	public static T Unwrap<T, E>(this Result<T, E> result) =>
+		result switch
+		{
+			Ok<T, E> ok => ok.Value,
+			Err<T, E> err =>
+				throw new InvalidOperationException($"Called Unwrap on Err: {err.Error}"),
+			_ => throw new InvalidOperationException()
+		};
+
+	public static T Expect<T, E>(
+		this Result<T, E> result,
+		string message) =>
+		result switch
+		{
+			Ok<T, E> ok => ok.Value,
+			Err<T, E> err =>
+				throw new InvalidOperationException($"{message}: {err.Error}"),
+			_ => throw new InvalidOperationException()
+		};
 }

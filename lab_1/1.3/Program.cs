@@ -1,6 +1,5 @@
 // dotnet run --project=./lab_1/1.3
 
-
 using _1._3;
 using Utils;
 

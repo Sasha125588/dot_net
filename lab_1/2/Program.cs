@@ -3,11 +3,20 @@
 using Utils;
 using _2;
 
-var result = ReadPointFromConsole("A")
-	.AndThen(a => ReadPointFromConsole("B")
-		.AndThen(b => ReadPointFromConsole("C")
-			.AndThen(c => Triangle.Create(a, b, c)
-				.MapError(MapTriangleErrorToString))));
+var pointResults = new[] { "A", "B", "C" }
+	.Select(ReadPointFromConsole)
+	.Collect();
+
+var result = pointResults
+	.AndThen(points => Triangle.Create(points[0], points[1], points[2])
+		.MapErr(MapTriangleErrorToString));
+
+
+// var result = ReadPointFromConsole("A")
+// 	.AndThen(a => ReadPointFromConsole("B")
+// 		.AndThen(b => ReadPointFromConsole("C")
+// 			.AndThen(c => Triangle.Create(a, b, c)
+// 				.MapErr(MapTriangleErrorToString))));
 
 
 result.Match(
@@ -21,12 +30,11 @@ result.Match(
 
 return;
 
-Result<Point, string> ReadPointFromConsole(string pointName)
-{
-	return ReadCoordinate(new Coordinate(pointName, "X"))
+Result<Point, string> ReadPointFromConsole(string pointName) =>
+	ReadCoordinate(new Coordinate(pointName, "X"))
 		.AndThen(x => ReadCoordinate(new Coordinate(pointName, "Y"))
-			.AndThen(y => new Result<Point, string>.Ok(new Point(x, y))));
-}
+			.Map(y => new Point(x, y)));
+
 
 Result<int, string> ReadCoordinate(Coordinate coord)
 {
@@ -34,12 +42,11 @@ Result<int, string> ReadCoordinate(Coordinate coord)
 	return ParseCoordinate(Console.ReadLine(), coord);
 }
 
-Result<int, string> ParseCoordinate(string? input, Coordinate coord)
-{
-	if (!int.TryParse(input, out var value))
-		return new Result<int, string>.Err($"[ПОМИЛКА]: некоректне значення {coord.AxisName} для точки {coord.Name}");
-	return new Result<int, string>.Ok(value);
-}
+Result<int, string> ParseCoordinate(string? input, Coordinate coord) =>
+	int.TryParse(input, out var value)
+		? Result.Ok<int, string>(value)
+		: Result.Err<int, string>($"[ПОМИЛКА]: некоректне значення {coord.AxisName} для точки {coord.Name}");
+
 
 static string MapTriangleErrorToString(TriangleError error) => error switch
 {

@@ -10,18 +10,18 @@ public static class Validator
 
 	private static Result<int, ValidationError> TryParseInt(string input) =>
 		int.TryParse(input, out var value)
-			? new Result<int, ValidationError>.Ok(value)
-			: new Result<int, ValidationError>.Err(new ValidationError.ParseError(input));
+			? Result.Ok<int, ValidationError>(value)
+			: Result.Err<int, ValidationError>(new ValidationError.ParseError(input));
 
 	private static Result<int, ValidationError> ValidateTooSmall(int value) =>
 		value >= MinValue
-			? new Result<int, ValidationError>.Ok(value)
-			: new Result<int, ValidationError>.Err(new ValidationError.TooSmall(value, MinValue));
+			? Result.Ok<int, ValidationError>(value)
+			: Result.Err<int, ValidationError>(new ValidationError.TooSmall(value, MinValue));
 
 	private static Result<int, ValidationError> ValidateDivisible(int value) =>
 		value % Divisor == 0
-			? new Result<int, ValidationError>.Ok(value)
-			: new Result<int, ValidationError>.Err(new ValidationError.NotDivisibleBy(value, Divisor));
+			? Result.Ok<int, ValidationError>(value)
+			: Result.Err<int, ValidationError>(new ValidationError.NotDivisibleBy(value, Divisor));
 
 	public static Result<int, ValidationError> ValidateHeight(string input) =>
 		TryParseInt(input)

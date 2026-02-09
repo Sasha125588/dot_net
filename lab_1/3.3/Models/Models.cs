@@ -1,14 +1,14 @@
 namespace _3._3.Models;
 
-public readonly record struct FlagDimensions(int Height, int Width)
-{
-	public static FlagDimensions FromHeight(int height) => new(height, height);
-}
-
 public enum Color
 {
 	Red,
 	White
+}
+
+public readonly record struct FlagDimensions(int Height, int Width)
+{
+	public static FlagDimensions FromHeight(int height) => new(height, height);
 }
 
 public readonly record struct CrossParams

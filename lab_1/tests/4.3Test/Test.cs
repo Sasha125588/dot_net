@@ -1,3 +1,4 @@
+using _4._3.ErrorFormatters;
 using _4._3.Errors;
 using _4._3.Models;
 using _4._3.Validation;
@@ -12,7 +13,7 @@ public class ValidationErrorTests
 	{
 		var error = new ValidationError.ParseDateOnlyError("abc");
 
-		var message = error.ToMessage();
+		var message = ValidationErrorFormatter.Format(error);
 
 		Assert.Equal("Не вдалося розпізнати 'abc' як дату", message);
 	}
@@ -24,9 +25,9 @@ public class ValidationErrorTests
 		var endDate = new DateOnly(2023, 1, 1);
 		var error = new ValidationError.ValidateStartDateAfterEndDate(startDate, endDate);
 
-		var message = error.ToMessage();
+		var message = ValidationErrorFormatter.Format(error);
 
-		Assert.Equal("Дата 31.12.2023 повинна бути раніше за дату 01.01.2023", message);
+		Assert.Equal("Дата Початку(31.12.2023) повинна бути раніше за дату Кінця(01.01.2023)", message);
 	}
 }
 

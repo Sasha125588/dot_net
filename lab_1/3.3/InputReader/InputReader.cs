@@ -1,3 +1,4 @@
+using _3._3.ErrorFormatters;
 using Utils;
 using _3._3.Errors;
 using _3._3.Validation;
@@ -17,21 +18,17 @@ public static class InputReader
 	{
 		while (true)
 		{
-			var result = ReadHeight();
-
-			if (result.IsOk())
+			switch (ReadHeight())
 			{
-				return result.Unwrap();
-			}
+				case Ok<int, ValidationError> ok:
+					return ok.Value;
+				case Err<int, ValidationError> err:
+					var errMsg = ValidationErrorFormatter.Format(err.Error);
 
-			result.Match(
-				onOk: _ => { },
-				onErr: error =>
-				{
-					Console.WriteLine($"❌ {error.ToMessage()}");
+					Console.WriteLine($"❌ {errMsg}");
 					Console.WriteLine();
-				}
-			);
+					break;
+			}
 		}
 	}
 }

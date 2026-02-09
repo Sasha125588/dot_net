@@ -1,3 +1,4 @@
+using _3._3.ErrorFormatters;
 using _3._3.Errors;
 using _3._3.Models;
 using _3._3.Validation;
@@ -12,7 +13,7 @@ public class ValidationErrorTests
 	{
 		var error = new ValidationError.ParseError("abc");
 
-		var message = error.ToMessage();
+		var message = ValidationErrorFormatter.Format(error);
 
 		Assert.Equal("Не вдалося розпізнати 'abc' як число", message);
 	}
@@ -22,7 +23,7 @@ public class ValidationErrorTests
 	{
 		var error = new ValidationError.TooSmall(3, 5);
 
-		var message = error.ToMessage();
+		var message = ValidationErrorFormatter.Format(error);
 
 		Assert.Equal("Значення 3 занадто мале (мінімум: 5)", message);
 	}
@@ -32,7 +33,7 @@ public class ValidationErrorTests
 	{
 		var error = new ValidationError.NotDivisibleBy(7, 5);
 
-		var message = error.ToMessage();
+		var message = ValidationErrorFormatter.Format(error);
 
 		Assert.Equal("Значення 7 має бути кратне 5", message);
 	}

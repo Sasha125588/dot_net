@@ -23,14 +23,11 @@ public class Triangle
 		_ca = C.DistanceTo(A);
 	}
 
-	public static Result<Triangle, TriangleError> Create(Point a, Point b, Point c)
-	{
-		if (!IsValid(a, b, c))
-			return new Result<Triangle, TriangleError>.Err(
-				new TriangleError.Degenerate(a, b, c));
+	public static Result<Triangle, TriangleError> Create(Point a, Point b, Point c) =>
+		IsValid(a, b, c)
+			? Result.Ok<Triangle, TriangleError>(new Triangle(a, b, c))
+			: Result.Err<Triangle, TriangleError>(new TriangleError.Degenerate(a, b, c));
 
-		return new Result<Triangle, TriangleError>.Ok(new Triangle(a, b, c));
-	}
 
 	public double Area()
 	{

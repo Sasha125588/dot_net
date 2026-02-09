@@ -147,10 +147,10 @@ public class ResultExtensionsTests
 	[Fact]
 	public void AndThen_WhenOk_CallsBinder()
 	{
-		var result = new Result<int, string>.Ok(10);
+		var result = Result.Ok<int, string>(10);
 
 		var mapped = result.AndThen(x =>
-			new Result<int, string>.Ok(x * 2));
+			Result.Ok<int, string>(x * 2));
 
 		Assert.Equal(20, mapped.ShouldBeOk());
 	}
@@ -159,12 +159,12 @@ public class ResultExtensionsTests
 	public void AndThen_WhenErr_DoesNotCallBinder()
 	{
 		var called = false;
-		var result = new Result<int, string>.Err("error");
+		var result = Result.Err<int, string>("error");
 
 		var mapped = result.AndThen(x =>
 		{
 			called = true;
-			return new Result<int, string>.Ok(x);
+			return Result.Ok<int, string>(x);
 		});
 
 		Assert.False(called);
@@ -174,7 +174,7 @@ public class ResultExtensionsTests
 	[Fact]
 	public void Match_WithOkResult_ExecutesOnOk()
 	{
-		var result = new Result<int, string>.Ok(42);
+		var result = Result.Ok<int, string>(42);
 		int? capturedValue = null;
 
 		result.Match(
@@ -188,7 +188,7 @@ public class ResultExtensionsTests
 	[Fact]
 	public void Match_WithErrResult_ExecutesOnErr()
 	{
-		var result = new Result<int, string>.Err("помилка");
+		var result = Result.Err<int, string>("помилка");
 		string? capturedError = null;
 
 		result.Match(
