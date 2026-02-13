@@ -37,10 +37,10 @@ public class PointTests
 		var a = new Point(1, 2);
 		var b = new Point(4, 6);
 
-		var distanceAB = a.DistanceTo(b);
-		var distanceBA = b.DistanceTo(a);
+		var distanceAb = a.DistanceTo(b);
+		var distanceBa = b.DistanceTo(a);
 
-		Assert.Equal(distanceAB, distanceBA, precision: 5);
+		Assert.Equal(distanceAb, distanceBa, precision: 5);
 	}
 }
 

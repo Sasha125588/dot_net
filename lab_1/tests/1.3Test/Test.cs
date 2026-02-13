@@ -74,7 +74,7 @@ public class TryParseGradeTests
 		var result = GradeHelper.TryParseGrade(input);
 
 		var error = result.ShouldBeErr();
-		Assert.Equal("очікується ціле число", error);
+		Assert.Equal($"Не вдалося розпізнати '{input}' як ціле число", error);
 	}
 
 	[Theory]

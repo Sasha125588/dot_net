@@ -1,8 +1,11 @@
+using _2.Errors;
+using Utils.Common;
+
 namespace _2;
 
 using Utils;
 
-public class Triangle
+public sealed record Triangle
 {
 	public Point A { get; }
 	public Point B { get; }
@@ -23,10 +26,10 @@ public class Triangle
 		_ca = C.DistanceTo(A);
 	}
 
-	public static Result<Triangle, TriangleError> Create(Point a, Point b, Point c) =>
+	public static Result<Triangle, IValidationError> Create(Point a, Point b, Point c) =>
 		IsValid(a, b, c)
-			? Result.Ok<Triangle, TriangleError>(new Triangle(a, b, c))
-			: Result.Err<Triangle, TriangleError>(new TriangleError.Degenerate(a, b, c));
+			? Result.Ok<Triangle, IValidationError>(new Triangle(a, b, c))
+			: Result.Err<Triangle, IValidationError>(new TriangleError.Degenerate(a, b, c));
 
 
 	public double Area()

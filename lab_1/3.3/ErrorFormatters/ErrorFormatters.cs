@@ -1,14 +1,14 @@
 using _3._3.Errors;
+using Utils.Common;
 
 namespace _3._3.ErrorFormatters;
 
 public static class ValidationErrorFormatter
 {
-	public static string Format(ValidationError err) => err switch
+	public static string Format(IValidationError err) => err switch
 	{
-		ValidationError.ParseError e => $"Не вдалося розпізнати '{e.Input}' як число",
-		ValidationError.TooSmall e => $"Значення {e.Value} занадто мале (мінімум: {e.MinValue})",
-		ValidationError.NotDivisibleBy e => $"Значення {e.Value} має бути кратне {e.Divisor}",
-		_ => "Невідома помилка"
+		ValidationError.TooSmallHeightError e => $"Значення {e.Value} занадто мале (мінімум: {e.MinValue})",
+		ValidationError.HeightNotDivisibleByError e => $"Значення {e.Value} має бути кратне {e.Divisor}",
+		_ => CommonValidationErrorFormatter.Format(err)
 	};
 }

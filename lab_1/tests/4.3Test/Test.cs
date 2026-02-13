@@ -1,8 +1,8 @@
 using _4._3.ErrorFormatters;
-using _4._3.Errors;
 using _4._3.Models;
 using _4._3.Validation;
 using Utils;
+using Utils.Common;
 
 namespace _4._3Test;
 
@@ -11,7 +11,7 @@ public class ValidationErrorTests
 	[Fact]
 	public void ToMessage_ParseDateOnlyError_ReturnsExpectedMessage()
 	{
-		var error = new ValidationError.ParseDateOnlyError("abc");
+		var error = new CommonValidationError.ParseDateOnlyError("abc");
 
 		var message = ValidationErrorFormatter.Format(error);
 
@@ -23,7 +23,7 @@ public class ValidationErrorTests
 	{
 		var startDate = new DateOnly(2023, 12, 31);
 		var endDate = new DateOnly(2023, 1, 1);
-		var error = new ValidationError.ValidateStartDateAfterEndDate(startDate, endDate);
+		var error = new DateRange.ValidateStartDateAfterEndDateError(startDate, endDate);
 
 		var message = ValidationErrorFormatter.Format(error);
 
@@ -64,7 +64,7 @@ public class ValidatorTests
 		var result = Validator.ValidateStartDate(input);
 
 		var error = result.ShouldBeErr();
-		Assert.IsType<ValidationError.ParseDateOnlyError>(error);
+		Assert.IsType<CommonValidationError.ParseDateOnlyError>(error);
 	}
 
 	public static TheoryData<string, DateOnly, DateOnly> ValidEndDateData =>
@@ -79,7 +79,7 @@ public class ValidatorTests
 	[MemberData(nameof(ValidEndDateData))]
 	public void ValidateEndDate_WithValidInput_ReturnsOk(string input, DateOnly startDate, DateOnly expected)
 	{
-		var result = Validator.ValidateEndDate(input, startDate);
+		var result = Validator.Validate(input, startDate);
 
 		var value = result.ShouldBeOk();
 		Assert.Equal(expected, value);
@@ -94,10 +94,10 @@ public class ValidatorTests
 	{
 		var startDate = new DateOnly(2023, 1, 1);
 
-		var result = Validator.ValidateEndDate(input, startDate);
+		var result = Validator.Validate(input, startDate);
 
 		var error = result.ShouldBeErr();
-		Assert.IsType<ValidationError.ParseDateOnlyError>(error);
+		Assert.IsType<CommonValidationError.ParseDateOnlyError>(error);
 	}
 
 	[Theory]
@@ -110,10 +110,10 @@ public class ValidatorTests
 	{
 		var startDate = DateOnly.Parse(startDateInput);
 
-		var result = Validator.ValidateEndDate(endDateInput, startDate);
+		var result = Validator.Validate(endDateInput, startDate);
 
 		var error = result.ShouldBeErr();
-		Assert.IsType<ValidationError.ValidateStartDateAfterEndDate>(error);
+		Assert.IsType<DateRange.ValidateStartDateAfterEndDateError>(error);
 	}
 
 	[Fact]
@@ -122,12 +122,12 @@ public class ValidatorTests
 		var startDate = new DateOnly(2023, 12, 31);
 		var endDateInput = "01.01.2023";
 
-		var result = Validator.ValidateEndDate(endDateInput, startDate);
+		var result = Validator.Validate(endDateInput, startDate);
 
 		var error = result.ShouldBeErr();
-		var validationError = Assert.IsType<ValidationError.ValidateStartDateAfterEndDate>(error);
-		Assert.Equal(startDate, validationError.FirstDate);
-		Assert.Equal(new DateOnly(2023, 1, 1), validationError.SecondDate);
+		var validationError = Assert.IsType<DateRange.ValidateStartDateAfterEndDateError>(error);
+		Assert.Equal(startDate, validationError.StartDate);
+		Assert.Equal(new DateOnly(2023, 1, 1), validationError.EndDate);
 	}
 }
 
@@ -217,7 +217,7 @@ public class DateRangeTests
 		var startDate = new DateOnly(2023, 1, 1);
 		var endDate = new DateOnly(2023, 12, 31);
 
-		var range = DateRange.From(startDate, endDate);
+		var range = DateRange.Create(startDate, endDate).ShouldBeOk();
 
 		Assert.Equal(startDate, range.StartDate);
 		Assert.Equal(endDate, range.EndDate);

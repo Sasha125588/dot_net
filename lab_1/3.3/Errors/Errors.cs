@@ -1,10 +1,9 @@
+using Utils.Common;
+
 namespace _3._3.Errors;
 
-public abstract record ValidationError
+public abstract record ValidationError : IValidationError
 {
-	public sealed record ParseError(string Input) : ValidationError;
-
-	public sealed record TooSmall(int Value, int MinValue) : ValidationError;
-
-	public sealed record NotDivisibleBy(int Value, int Divisor) : ValidationError;
+	public sealed record TooSmallHeightError(int Value, int MinValue) : ValidationError;
+	public sealed record HeightNotDivisibleByError(int Value, int Divisor) : ValidationError;
 }

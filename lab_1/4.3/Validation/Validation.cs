@@ -1,26 +1,24 @@
 using Utils;
-using _4._3.Errors;
+using Utils.Common;
+using _4._3.Models;
 
 namespace _4._3.Validation;
 
 public static class Validator
 {
-	private static Result<DateOnly, ValidationError> TryParseDateOnly(string input) =>
-		DateOnly.TryParse(input, out var value)
-			? Result.Ok<DateOnly, ValidationError>(value)
-			: Result.Err<DateOnly, ValidationError>(new ValidationError.ParseDateOnlyError(input));
+	private static readonly DateOnlyValidator DateOnlyValidator = new();
 
-	private static Result<DateOnly, ValidationError>
+	private static Result<DateOnly, IValidationError>
 		ValidateEndDateIsAfterStartDate(DateOnly startDate, DateOnly endDate) =>
 		startDate < endDate
-			? Result.Ok<DateOnly, ValidationError>(endDate)
-			: Result.Err<DateOnly, ValidationError>(
-				new ValidationError.ValidateStartDateAfterEndDate(startDate, endDate));
+			? Result.Ok<DateOnly, IValidationError>(endDate)
+			: Result.Err<DateOnly, IValidationError>(
+				new DateRange.ValidateStartDateAfterEndDateError(startDate, endDate));
 
-	public static Result<DateOnly, ValidationError> ValidateStartDate(string input) =>
-		TryParseDateOnly(input);
+	public static Result<DateOnly, IValidationError> ValidateStartDate(string input) =>
+		DateOnlyValidator.Validate(input);
 
-	public static Result<DateOnly, ValidationError> ValidateEndDate(string input, DateOnly startDate) =>
-		TryParseDateOnly(input)
+	public static Result<DateOnly, IValidationError> Validate(string input, DateOnly startDate) =>
+		DateOnlyValidator.Validate(input)
 			.AndThen(endDate => ValidateEndDateIsAfterStartDate(startDate, endDate));
 }

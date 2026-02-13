@@ -1,30 +1,30 @@
 using Utils;
+using Utils.Common;
 using _3._3.Errors;
 
 namespace _3._3.Validation;
 
 public static class Validator
 {
-	private const int MinValue = 5;
+	private static readonly IntValidator IntValidator = new();
+	private const int MinHeight = 5;
 	private const int Divisor = 5;
 
-	private static Result<int, ValidationError> TryParseInt(string input) =>
-		int.TryParse(input, out var value)
-			? Result.Ok<int, ValidationError>(value)
-			: Result.Err<int, ValidationError>(new ValidationError.ParseError(input));
+	private static Result<int, IValidationError> TryParseInt(string input) =>
+		IntValidator.Validate(input);
 
-	private static Result<int, ValidationError> ValidateTooSmall(int value) =>
-		value >= MinValue
-			? Result.Ok<int, ValidationError>(value)
-			: Result.Err<int, ValidationError>(new ValidationError.TooSmall(value, MinValue));
+	private static Result<int, IValidationError> ValidateMinHeight(int height) =>
+		height >= MinHeight
+			? Result.Ok<int, IValidationError>(height)
+			: Result.Err<int, IValidationError>(new ValidationError.TooSmallHeightError(height, MinHeight));
 
-	private static Result<int, ValidationError> ValidateDivisible(int value) =>
-		value % Divisor == 0
-			? Result.Ok<int, ValidationError>(value)
-			: Result.Err<int, ValidationError>(new ValidationError.NotDivisibleBy(value, Divisor));
+	private static Result<int, IValidationError> ValidateDivisibleByFive(int height) =>
+		height % Divisor == 0
+			? Result.Ok<int, IValidationError>(height)
+			: Result.Err<int, IValidationError>(new ValidationError.HeightNotDivisibleByError(height, Divisor));
 
-	public static Result<int, ValidationError> ValidateHeight(string input) =>
+	public static Result<int, IValidationError> Validate(string input) =>
 		TryParseInt(input)
-			.AndThen(ValidateTooSmall)
-			.AndThen(ValidateDivisible);
+			.AndThen(ValidateMinHeight)
+			.AndThen(ValidateDivisibleByFive);
 }

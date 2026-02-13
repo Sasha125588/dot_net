@@ -4,7 +4,7 @@ namespace _4._3.Rendering;
 
 public static class Rendering
 {
-	public static void DisplayResult(DateRange range)
+	public static void Draw(DateRange range)
 	{
 		Console.WriteLine();
 		Console.WriteLine("═══════════════════════════════════════");

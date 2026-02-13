@@ -4,42 +4,21 @@ namespace _3._3.Rendering;
 
 public static class Rendering
 {
-	private static void SetConsoleColor(this Color color)
+	public static void Draw(int height, CrossParams cross)
 	{
-		(Console.BackgroundColor, Console.ForegroundColor) = color switch
+		for (var row = 0; row < height; row++)
 		{
-			Color.Red => (ConsoleColor.Red, ConsoleColor.Red),
-			Color.White => (ConsoleColor.White, ConsoleColor.White),
-			_ => throw new ArgumentOutOfRangeException(nameof(color))
-		};
-	}
+			for (var col = 0; col < height; col++)
+			{
+				var color = cross.IsPointInCross(row, col) ? ConsoleColor.White : ConsoleColor.Red;
 
-	private static void DrawPixel(Color color)
-	{
-		// SetConsoleColor(color); 
-		color.SetConsoleColor(); // [ЗАПИТАТИ]
-		Console.Write("█");
-	}
+				Console.BackgroundColor = color;
+				Console.ForegroundColor = color;
+				Console.Write("  ");
+			}
 
-	private static void DrawRow(int row, FlagDimensions dims, CrossParams cross)
-	{
-		for (var col = 0; col < dims.Width; col++)
-		{
-			var color = cross.IsPointInCross(row, col) ? Color.White : Color.Red;
-			DrawPixel(color);
-		}
-
-		Console.ResetColor();
-		Console.WriteLine();
-	}
-
-	public static void DrawFlag(FlagDimensions dims)
-	{
-		var cross = CrossParams.FromDimensions(dims);
-
-		for (var row = 0; row < dims.Height; row++)
-		{
-			DrawRow(row, dims, cross);
+			Console.ResetColor();
+			Console.WriteLine();
 		}
 
 		Console.ResetColor();
